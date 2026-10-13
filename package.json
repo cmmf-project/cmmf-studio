@@ -1,0 +1,36 @@
+{
+  "name": "cmmf-visual-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "test": "vitest run src",
+    "preview": "vite preview --host 0.0.0.0",
+    "test:browser": "playwright test",
+    "format": "prettier --write src tests *.ts *.json *.md index.html"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@xyflow/react": "^12.12.0",
+    "ajv": "^8.17.1",
+    "elkjs": "^0.12.0",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.545.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3",
+    "vite": "^6.4.1",
+    "vitest": "^4.1.11"
+  }
+}
