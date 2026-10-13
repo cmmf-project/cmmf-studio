@@ -1,6 +1,14 @@
-# CMMF Model Studio
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/assets/studio-horizontal-gradient-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/brand/assets/studio-horizontal-gradient-light.svg">
+  <img alt="CMMF Studio" src="docs/brand/assets/studio-horizontal-gradient-light.svg" width="550">
+</picture>
+
+# CMMF Studio
 
 A browser-based visual editor for CMMF content models. Built with React, TypeScript, Vite and React Flow. No backend is required.
+
+Studio uses the CMMF identity, with Source Sans 3 for interface text and Quattrocento for dedicated reading content. See [branding integration](docs/branding.md) for the font roles and asset locations. The full brand workspace is maintained separately from this application.
 
 ## Run locally
 

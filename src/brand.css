@@ -1,0 +1,395 @@
+/* CMMF identity. Canonical roles live in the adjacent cmmf-branding workspace:
+ * ../cmmf-branding/docs/brand/usage.md (relative to the Studio project root).
+ * Source Sans 3 is the operational default. Quattrocento belongs to dedicated
+ * reading content, never to form inputs, field labels or short functional help.
+ * Logo masters and local fonts are shared with the main brand kit. */
+:root {
+  font-family: var(--font-interface);
+  color: var(--cmmf-ink);
+  background: var(--cmmf-paper);
+  --text: var(--cmmf-ink);
+  --strong: var(--cmmf-ink);
+  --muted: var(--cmmf-muted);
+  --canvas-bg: var(--cmmf-paper);
+  --canvas-dots: #ced6d0;
+  --surface: #ffffff;
+  --surface-soft: #f0f3ee;
+  --surface-hover: #e9eee8;
+  --border: #d9dfda;
+  --accent: var(--brand-name);
+  --accent-soft: #f1eaf4;
+  --accent-ring: #945d9c26;
+  --edge-color: #8362b7;
+  --edge-label: var(--brand-name);
+  --edge-highlight: var(--brand-name);
+  --edge-incoming: #c1639a;
+  --mini-node: #d8c7e0;
+  --mini-node-muted: #e7eae5;
+  --mini-mask: #f6f7f3b3;
+  --success: #397c61;
+  --warning: #8c6227;
+  --danger: #aa4949;
+  --on-action: #ffffff;
+}
+:root[data-theme="dark"] {
+  --text: var(--cmmf-paper);
+  --strong: var(--cmmf-paper);
+  --muted: #b4c1bd;
+  --canvas-bg: var(--cmmf-ink);
+  --canvas-dots: #39464a;
+  --surface: #222e34;
+  --surface-soft: #2b383e;
+  --surface-hover: #34434a;
+  --border: #425158;
+  /* Lighter UI accent for contrast on raised dark panels; logo tone stays canonical. */
+  --accent: #c395c9;
+  --accent-soft: #42364c;
+  --accent-ring: #ad76b333;
+  --edge-color: #ad76b3;
+  --edge-label: #cba6d1;
+  --edge-highlight: #d6b8df;
+  --edge-incoming: #c994ba;
+  --mini-node: #9974a6;
+  --mini-node-muted: #344249;
+  --mini-mask: #192329bf;
+  --success: #95c9b0;
+  --warning: #e5bd7d;
+  --danger: #edaaaa;
+  --on-action: var(--cmmf-ink);
+}
+:root[data-brand="studio"] :is(body) {
+  color: var(--text);
+  background: var(--canvas-bg);
+}
+:root[data-brand="studio"] .topbar {
+  padding-left: 18px;
+}
+:root[data-brand="studio"] :is(.brand) {
+  flex-shrink: 0;
+}
+:root[data-brand="studio"] :is(.studio-logo) {
+  display: block;
+  width: 208px;
+  height: auto;
+}
+:root[data-brand="studio"] :is(.project > input) {
+  color: var(--text);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .topbar,
+      .sidebar,
+      .dropdown,
+      .model-node,
+      .canvas-tools,
+      .floating-panel,
+      .issues-panel,
+      .guide,
+      .react-flow__controls-button,
+      .add-type-popout
+    )
+  ) {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .model-drag,
+      .add-field,
+      .floating-panel > header,
+      .new-type,
+      .panel-eyebrow span,
+      .react-flow__minimap
+    )
+  ) {
+  background: var(--surface-soft);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .project > input,
+      .node-heading input,
+      .field-row input,
+      .panel-body h2,
+      .panel-body label,
+      legend,
+      .guide b,
+      .guide header,
+      .issues-panel header
+    )
+  ) {
+  color: var(--text);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .sidebar-title > span,
+      .new-type,
+      .palette-field,
+      .field-type,
+      .node-heading span,
+      .help-button,
+      .board-count,
+      .canvas-caption,
+      .saved,
+      .section-label,
+      .section-label > span,
+      .dropdown small,
+      .panel-eyebrow,
+      .panel-body small,
+      .hint,
+      .panel-footer span,
+      .value-kind,
+      .advanced summary,
+      .model-finder,
+      .new-type small,
+      .add-field,
+      .add-field span,
+      .issues-panel p,
+      .sidebar-note,
+      .sidebar-note > strong,
+      .icon-button,
+      .field-edit,
+      .canvas-tools button
+    )
+  ) {
+  color: var(--muted);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .model-symbol,
+      .new-type > span,
+      .canvas-tools button.active,
+      .layout-controls button[aria-pressed="true"]
+    )
+  ) {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--border);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .icon-button:hover,
+      .plain-button:hover,
+      .palette-field:hover,
+      .field-row:hover,
+      .add-field:hover,
+      .canvas-tools button:hover,
+      .dropdown > button:hover
+    )
+  ) {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+:root[data-brand="studio"]
+  :is(.model-node.selected, .node-focused .model-node) {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 3px var(--accent-ring),
+    0 12px 25px #1923290a;
+}
+:root[data-brand="studio"] :is(.dark-button, .toast) {
+  background: var(--strong);
+  color: var(--on-action);
+}
+:root[data-brand="studio"] :is(.dark-button:hover) {
+  background: var(--accent);
+  color: #ffffff;
+}
+:root[data-brand="studio"] :is(.toast button) {
+  color: inherit;
+}
+:root[data-brand="studio"]
+  :is(.saved > span, .validation-badge:not(.has-issues)) {
+  color: var(--success);
+}
+:root[data-brand="studio"] :is(.saved > span) {
+  background: var(--success);
+}
+:root[data-brand="studio"] :is(.validation-badge) {
+  background: var(--surface);
+  border-color: var(--border);
+}
+:root[data-brand="studio"] :is(.validation-badge.has-issues, .issues-panel ul) {
+  color: var(--warning);
+}
+:root[data-brand="studio"] :is(.issue-dot) {
+  background: var(--warning);
+}
+:root[data-brand="studio"] :is(.required) {
+  color: var(--accent);
+}
+:root[data-brand="studio"] :is(.panel-tabs button.active) {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+:root[data-brand="studio"] :is(.panel-body h2) {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  font-size: 26px;
+}
+:root[data-brand="studio"] :is(.guide) {
+  width: 440px;
+  max-height: calc(100dvh - 120px);
+}
+:root[data-brand="studio"] :is(.guide header) {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 21px;
+}
+:root[data-brand="studio"] :is(.guide p) {
+  font-family: var(--font-editorial);
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--text);
+}
+:root[data-brand="studio"] :is(.guide b) {
+  font-weight: 700;
+}
+/* Editable descriptions and short hints remain operational text. */
+:root[data-brand="studio"]
+  :is(
+    :is(input, textarea, select, .hint, .panel-body small, .import-options p)
+  ) {
+  font-family: var(--font-interface);
+}
+:root[data-brand="studio"]
+  :is(
+    :is(
+      .panel-body label > input:not([type="checkbox"]),
+      .panel-body label > select,
+      .panel-body label > textarea,
+      .value-editor input,
+      .value-editor select,
+      .model-finder select,
+      .import-options select
+    )
+  ) {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+:root[data-brand="studio"] :is(.panel-body label > input[readonly]) {
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+:root[data-brand="studio"] :is(.search input) {
+  color: var(--text);
+}
+:root[data-brand="studio"] :is(input::placeholder, textarea::placeholder) {
+  color: var(--muted);
+}
+:root[data-brand="studio"] :is(input:focus, textarea:focus, select:focus) {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+:root[data-brand="studio"] :is(button:focus-visible) {
+  outline-color: var(--accent);
+}
+:root[data-brand="studio"] :is(.toggle input) {
+  accent-color: var(--accent);
+}
+:root[data-brand="studio"] :is(.target-chips button) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+:root[data-brand="studio"] :is(.danger-link, .error) {
+  color: var(--danger) !important;
+}
+:root[data-brand="studio"] :is(.react-flow__handle) {
+  background: var(--brand-from);
+  border-color: var(--surface);
+}
+:root[data-brand="studio"] :is(.model-target) {
+  background: var(--brand-to);
+}
+:root[data-brand="studio"] :is(.field-row input, .node-heading input) {
+  border-color: transparent;
+}
+:root[data-brand="studio"] :is(.divider) {
+  background: var(--border);
+}
+@media (min-width: 1101px) {
+  /* Align the divider with the sidebar's 1px border inside its 244px width. */
+  :root[data-brand="studio"] .topbar {
+    gap: 17px;
+  }
+}
+@media (max-width: 1100px) {
+  :root[data-brand="studio"] .topbar {
+    padding-left: 14px;
+  }
+  :root[data-brand="studio"] :is(.studio-logo) {
+    width: 208px;
+  }
+}
+@media (max-width: 750px) {
+  :root[data-brand="studio"] .topbar {
+    padding-left: 10px;
+  }
+  :root[data-brand="studio"] :is(.studio-logo) {
+    width: 132px;
+  }
+  :root[data-brand="studio"] :is(.project > input) {
+    width: 100px;
+  }
+  :root[data-brand="studio"] :is(.guide) {
+    width: calc(100vw - 20px);
+  }
+}
+@media (max-width: 480px) {
+  :root[data-brand="studio"] :is(.topbar) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 64px 40px;
+    height: 104px;
+    gap: 0 12px;
+  }
+  :root[data-brand="studio"] :is(.studio-logo) {
+    width: 132px;
+  }
+  :root[data-brand="studio"] :is(.project) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-width: 0;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    padding: 6px 0;
+  }
+  :root[data-brand="studio"] .project > .divider {
+    display: none;
+  }
+  :root[data-brand="studio"] :is(.project > input) {
+    width: 100%;
+    min-width: 45px;
+  }
+  :root[data-brand="studio"] :is(.top-actions) {
+    flex-shrink: 0;
+    justify-self: end;
+  }
+  :root[data-brand="studio"]
+    :is(.top-actions > .icon-button:not(.theme-toggle)) {
+    display: none;
+  }
+  :root[data-brand="studio"] main {
+    height: calc(100dvh - 104px);
+  }
+}
+
+:root[data-brand="studio"] .panel-body .code-input {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+:root[data-brand="studio"] :is(.floating-panel > header, .panel-tabs button) {
+  color: var(--muted);
+}
+:root[data-brand="studio"] .panel-tabs button.active {
+  color: var(--accent);
+}
+:root[data-brand="studio"] .sidebar-note > svg {
+  color: var(--accent);
+}

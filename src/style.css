@@ -1,5 +1,5 @@
 :root {
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--font-interface);
   color: #343530;
   background: #f6f5f1;
   font-synthesis: none;
@@ -69,34 +69,6 @@ a {
   gap: 11px;
   align-items: center;
 }
-.brand-mark {
-  width: 35px;
-  height: 35px;
-  display: grid;
-  place-content: center;
-  background: #3b453c;
-  color: #fff;
-  border-radius: 10px;
-  font-family: Georgia, serif;
-  font-size: 29px;
-  line-height: 1;
-}
-.brand-mark span {
-  color: #c4d8ae;
-}
-.brand > div {
-  font-size: 18px;
-  font-weight: 650;
-  letter-spacing: -0.5px;
-}
-.brand > div > span {
-  display: block;
-  font-size: 11px;
-  letter-spacing: 0;
-  margin-top: 3px;
-  font-weight: 500;
-  color: #82847c;
-}
 .project {
   display: flex;
   gap: 22px;
@@ -112,13 +84,13 @@ a {
 .project > input {
   border: 0;
   background: none;
-  font-weight: 550;
+  font-weight: 500;
   width: 170px;
   padding: 6px 0;
 }
 .saved {
   color: #90948a;
-  font-size: 11px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -158,7 +130,7 @@ a {
   border: 0;
   border-radius: 7px;
   padding: 10px 14px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 .plain-button {
@@ -204,7 +176,7 @@ a {
 .dropdown small {
   display: block;
   color: #96988d;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 4px;
 }
 main {
@@ -236,7 +208,7 @@ main {
   margin-bottom: 19px;
 }
 .sidebar-title > span {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
   color: #8b8e80;
@@ -264,11 +236,11 @@ main {
 }
 .new-type > div {
   flex: 1;
-  font-size: 12px;
-  font-weight: 550;
+  font-size: 14px;
+  font-weight: 500;
 }
 .new-type small {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 400;
   display: block;
   color: #969b8b;
@@ -278,16 +250,16 @@ main {
   color: #9da38f;
 }
 .section-label {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0;
-  font-weight: 650;
+  font-weight: 600;
   color: #858979;
   display: flex;
   justify-content: space-between;
   margin: 29px 0 12px;
 }
 .section-label > span {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0;
   font-weight: 400;
   color: #a0a194;
@@ -305,7 +277,7 @@ main {
 .search input {
   width: 100%;
   border: 0;
-  font-size: 11px;
+  font-size: 13px;
   background: none;
 }
 .search input::placeholder {
@@ -326,7 +298,7 @@ main {
   padding: 6px 7px;
   border-radius: 6px;
   text-align: left;
-  font-size: 11px;
+  font-size: 13px;
   cursor: grab;
 }
 .palette-field:hover {
@@ -344,7 +316,7 @@ main {
   border-radius: 5px;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1;
   font-weight: 600;
   flex-shrink: 0;
@@ -399,12 +371,12 @@ main {
 }
 .sidebar-note > strong {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   color: #767c68;
 }
 .sidebar-note p {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
   margin: 7px 0 0;
 }
@@ -418,14 +390,14 @@ main {
   gap: 8px;
   padding: 15px 3px 0;
   color: #8e9282;
-  font-size: 11px;
+  font-size: 13px;
 }
 .help-button span {
   margin-left: auto;
   border: 1px solid #dfe0d6;
   border-radius: 4px;
   padding: 1px 5px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .canvas {
   flex: 1;
@@ -444,7 +416,7 @@ main {
 }
 .board-count {
   color: #a0a193;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 4px;
 }
 .board-count span {
@@ -507,7 +479,7 @@ main {
   border-radius: 3px;
 }
 .node-heading span {
-  font-size: 9px;
+  font-size: 11px;
   color: #a1a593;
   display: block;
   margin-top: 5px;
@@ -541,7 +513,7 @@ main {
 .field-row .type-icon {
   width: 22px;
   height: 22px;
-  font-size: 11px;
+  font-size: 13px;
 }
 .field-row input {
   width: 100%;
@@ -549,13 +521,13 @@ main {
   flex: 1;
   background: none;
   border: 1px solid transparent;
-  font-size: 11px;
+  font-size: 13px;
   padding: 2px;
   border-radius: 3px;
   color: #5b5d52;
 }
 .field-type {
-  font-size: 8px;
+  font-size: 10px;
   white-space: nowrap;
   color: #9fa291;
 }
@@ -591,7 +563,7 @@ main {
   padding: 13px 17px;
   background: #fdfdfa;
   border-radius: 0 0 10px 10px;
-  font-size: 10px;
+  font-size: 12px;
   color: #9a9e8b;
 }
 .add-field:hover {
@@ -600,7 +572,7 @@ main {
 }
 .add-field span {
   margin-left: auto;
-  font-size: 9px;
+  font-size: 11px;
   color: #b9bbad;
 }
 .react-flow__handle {
@@ -663,7 +635,7 @@ main {
   border: 1px solid #e1e2d8;
   padding: 8px 10px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 12px;
   color: #8a9679;
 }
 .validation-badge.has-issues {
@@ -680,7 +652,7 @@ main {
   bottom: 19px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 9px;
+  font-size: 11px;
   white-space: nowrap;
   color: #a6a797;
 }
@@ -720,7 +692,7 @@ main {
   height: 85px;
 }
 .react-flow__attribution {
-  font-size: 8px;
+  font-size: 10px;
   background: none;
   bottom: 9px;
   right: 20px;
@@ -746,7 +718,7 @@ main {
   padding: 12px 14px;
   border-bottom: 1px solid #e9eae1;
   color: #89907d;
-  font-size: 11px;
+  font-size: 13px;
   cursor: move;
   touch-action: none;
   background: #fafbf7;
@@ -760,7 +732,7 @@ main {
   padding: 21px;
 }
 .panel-eyebrow {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0;
   color: #9a9f8d;
   display: flex;
@@ -768,14 +740,14 @@ main {
   justify-content: space-between;
 }
 .panel-eyebrow span {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0;
   background: #f0f2e9;
   border-radius: 4px;
   padding: 3px 6px;
 }
 .panel-body h2 {
-  font-family: "Instrument Serif", Georgia, serif;
+  font-family: var(--font-interface);
   font-weight: 400;
   font-size: 29px;
   margin: 10px 0 20px;
@@ -790,7 +762,7 @@ main {
 .panel-tabs button {
   border: 0;
   background: none;
-  font-size: 11px;
+  font-size: 13px;
   padding: 0 0 10px;
   color: #a0a493;
 }
@@ -800,7 +772,7 @@ main {
 }
 .panel-body label {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   color: #818875;
   font-weight: 500;
   margin: 0 0 16px;
@@ -816,7 +788,7 @@ main {
   border-radius: 5px;
   margin-top: 7px;
   color: #555e4e;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
 }
 .panel-body textarea {
@@ -829,7 +801,7 @@ main {
 }
 .panel-body small {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.5;
   margin-top: 5px;
@@ -846,7 +818,7 @@ main {
 }
 .panel-body .code-input {
   font-family: monospace;
-  font-size: 10px;
+  font-size: 12px;
 }
 .two-cols {
   display: flex;
@@ -866,14 +838,14 @@ main {
   background: #f0eafa;
   color: #9b7abb;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   gap: 5px;
   padding: 5px 7px;
 }
 .hint {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
   color: #9ba18e;
 }
@@ -883,7 +855,7 @@ main {
   padding-top: 14px;
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: 11px;
   gap: 5px;
 }
 .panel-footer span {
@@ -900,7 +872,7 @@ main {
   background: none;
   padding: 0;
   color: #ba9288;
-  font-size: 9px;
+  font-size: 11px;
 }
 .issues-panel,
 .guide {
@@ -936,16 +908,16 @@ main {
 .guide p {
   color: #929987;
   line-height: 1.8;
-  font-size: 12px;
+  font-size: 14px;
 }
 .guide b {
-  font-weight: 550;
+  font-weight: 500;
   color: #71805f;
 }
 .issues-panel ul {
   padding-left: 17px;
   color: #b1986d;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.8;
 }
 .toast {
@@ -959,7 +931,7 @@ main {
   color: #eef2e5;
   border-radius: 8px;
   padding: 14px 18px;
-  font-size: 12px;
+  font-size: 14px;
   box-shadow: 0 8px 40px #30372825;
   display: flex;
   gap: 15px;
@@ -1014,7 +986,7 @@ main {
   }
   .project > input {
     width: 130px;
-    font-size: 11px;
+    font-size: 13px;
   }
   .top-actions {
     gap: 4px;
@@ -1025,24 +997,24 @@ main {
   }
   .dark-button {
     padding: 9px;
-    font-size: 11px;
+    font-size: 13px;
   }
   .sidebar {
     width: 175px;
     padding: 12px 10px;
   }
   .sidebar-title > span {
-    font-size: 8px;
+    font-size: 10px;
   }
   .new-type {
     gap: 7px;
     padding: 10px 6px;
   }
   .new-type > div {
-    font-size: 10px;
+    font-size: 12px;
   }
   .new-type small {
-    font-size: 8px;
+    font-size: 10px;
   }
   .section-label > span {
     display: none;
@@ -1090,7 +1062,7 @@ main {
 .sidebar-title > span,
 .section-label,
 .panel-eyebrow {
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -1101,14 +1073,14 @@ fieldset {
   margin: 20px 0;
 }
 legend {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #6e7a61;
   padding-right: 10px;
 }
 .value-editor {
   margin: 10px 0;
-  font-size: 11px;
+  font-size: 13px;
   min-width: 0;
 }
 .value-kind {
@@ -1121,7 +1093,7 @@ legend {
 }
 .value-kind select {
   max-width: 105px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .value-editor input,
 .value-editor select,
@@ -1162,13 +1134,13 @@ legend {
   width: 100%;
 }
 .advanced summary {
-  font-size: 11px;
+  font-size: 13px;
   color: #8b957e;
   cursor: pointer;
   margin: 15px 0;
 }
 .model-finder {
-  font-size: 11px;
+  font-size: 13px;
   color: #7f8873;
   margin-top: 16px;
 }
@@ -1176,16 +1148,16 @@ legend {
   display: block;
   margin-top: 7px;
   width: 100%;
-  font-size: 11px;
+  font-size: 13px;
 }
 .palette-field {
-  font-size: 12px;
+  font-size: 14px;
 }
 .field-row input {
-  font-size: 12px;
+  font-size: 14px;
 }
 .field-type {
-  font-size: 9px;
+  font-size: 11px;
 }
 .sidebar-note {
   padding-top: 20px;
@@ -1251,7 +1223,7 @@ legend {
   border-radius: 5px;
   padding: 4px 7px;
   color: var(--edge-label);
-  font-size: 11px;
+  font-size: 13px;
   transition: opacity 120ms ease;
 }
 .connection-label.muted {
@@ -1259,12 +1231,12 @@ legend {
 }
 .connection-label.emphasis {
   color: var(--edge-highlight);
-  font-weight: 650;
+  font-weight: 600;
 }
 .layout-controls {
   margin-top: 20px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .layout-controls > div {
   display: flex;
@@ -1278,7 +1250,7 @@ legend {
   background: var(--surface);
   color: var(--muted);
   padding: 8px 6px;
-  font-size: 11px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1295,7 +1267,7 @@ legend {
 .layout-controls small {
   display: block;
   margin-top: 6px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .add-type-popout {
   position: fixed;
@@ -1315,7 +1287,7 @@ legend {
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px 10px;
-  font-size: 12px;
+  font-size: 14px;
   border-bottom: 1px solid var(--border);
 }
 .add-type-popout > button {
@@ -1335,12 +1307,12 @@ legend {
 }
 .add-type-popout > button span {
   flex: 1;
-  font-size: 12px;
-  font-weight: 550;
+  font-size: 14px;
+  font-weight: 500;
 }
 .add-type-popout small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 400;
   color: var(--muted);
   margin-top: 4px;
@@ -1352,7 +1324,7 @@ legend {
 }
 .import-options label {
   display: block;
-  font-size: 12px;
+  font-size: 14px;
 }
 .import-options select {
   display: block;
@@ -1365,7 +1337,7 @@ legend {
   color: var(--text);
 }
 .import-options p {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   line-height: 1.6;
 }
@@ -1373,7 +1345,7 @@ legend {
   justify-content: center;
   background: var(--surface-soft);
   border: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 14px;
 }
 [data-theme="dark"] .studio * {
   border-color: var(--border);
@@ -1642,7 +1614,7 @@ legend {
 .field-name-editor > input,
 .field-name-measure {
   grid-area: 1 / 1;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
 }
 .field-name-measure {

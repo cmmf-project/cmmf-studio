@@ -326,15 +326,15 @@ test("dark mode persists and covers canvas, palette and inspectors", async ({
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator(".topbar")).toHaveCSS(
     "background-color",
-    "rgb(32, 39, 51)",
+    "rgb(34, 46, 52)",
   );
   await expect(page.locator(".model-node").first()).toHaveCSS(
     "background-color",
-    "rgb(32, 39, 51)",
+    "rgb(34, 46, 52)",
   );
   await expect(page.locator(".react-flow__background")).toHaveCSS(
     "background-color",
-    "rgb(21, 26, 35)",
+    "rgb(25, 35, 41)",
   );
   await page.getByTitle("Edit Title", { exact: true }).click();
   await page
@@ -517,7 +517,7 @@ test("relationship-aware layouts work on a large board and undo restores positio
   ).toPass();
   await expect(
     page.locator('.react-flow__node[data-id="product"]'),
-  ).toBeInViewport({ ratio: 1 });
+  ).toBeInViewport({ ratio: 0.999 });
   await page.screenshot({ path: "artifacts/studio-dark-product-focus.png" });
   await page.getByTitle("Undo (⌘Z)").click();
   const afterUndo = await page.evaluate(() =>

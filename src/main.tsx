@@ -80,13 +80,14 @@ import {
   type LayoutMode,
 } from "./layout";
 import { RoutedEdge } from "./routed-edge";
-import "@fontsource/dm-sans/400.css";
-import "@fontsource/dm-sans/500.css";
-import "@fontsource/dm-sans/600.css";
-import "@fontsource/instrument-serif/400.css";
-import "@fontsource/instrument-serif/400-italic.css";
+import studioLogoLight from "./assets/brand/studio-header-horizontal-gradient-light.svg";
+import studioLogoDark from "./assets/brand/studio-header-horizontal-gradient-dark.svg";
+import studioLogoCompactLight from "./assets/brand/studio-header-compact-gradient-light.svg";
+import studioLogoCompactDark from "./assets/brand/studio-header-compact-gradient-dark.svg";
+import "./assets/brand/tokens/brand.css";
 import "@xyflow/react/dist/style.css";
 import "./style.css";
+import "./brand.css";
 type Panel = {
   key: string;
   model: string;
@@ -842,6 +843,9 @@ function Studio() {
   const canvasRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", theme === "dark" ? "#192329" : "#F6F7F3");
     try {
       localStorage.setItem("cmmf-theme", theme);
     } catch {}
@@ -1050,7 +1054,7 @@ function Studio() {
     if (id && zoom)
       void flow.fitView({
         nodes: [{ id }],
-        padding: 0.4,
+        padding: 0.35,
         maxZoom: 1,
         duration: 250,
       });
@@ -1372,13 +1376,22 @@ function Studio() {
       <Context.Provider value={actions}>
         <div className="studio">
           <header className="topbar">
-            <a className="brand" href="#" aria-label="Model Studio home">
-              <span className="brand-mark">
-                c<span>·</span>
-              </span>
-              <div>
-                CMMF<span>Model Studio</span>
-              </div>
+            <a className="brand" href="#" aria-label="CMMF Studio home">
+              <picture>
+                <source
+                  media="(max-width: 750px)"
+                  srcSet={
+                    theme === "dark"
+                      ? studioLogoCompactDark
+                      : studioLogoCompactLight
+                  }
+                />
+                <img
+                  className="studio-logo"
+                  src={theme === "dark" ? studioLogoDark : studioLogoLight}
+                  alt="CMMF Studio"
+                />
+              </picture>
             </a>
             <div className="project">
               <span className="divider" />
