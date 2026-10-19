@@ -81,6 +81,7 @@ import {
   type LayoutMode,
 } from "./layout";
 import { RoutedEdge } from "./routed-edge";
+import { KindIcon } from "./kind-icons";
 import studioLogoLight from "./assets/brand/studio-header-horizontal-gradient-light.svg";
 import studioLogoDark from "./assets/brand/studio-header-horizontal-gradient-dark.svg";
 import studioLogoCompactLight from "./assets/brand/studio-header-compact-gradient-light.svg";
@@ -140,7 +141,7 @@ function ContentNode({
       />
       <header className="model-drag">
         <div className="model-symbol">
-          <Layers size={17} />
+          <KindIcon kind={m.kind} />
         </div>
         <div className="node-heading">
           <input
@@ -1946,7 +1947,7 @@ function Studio() {
                   }
                   onClick={() => addModel(undefined, kind)}
                 >
-                  <Layers size={17} />
+                  <KindIcon kind={kind} />
                   <span>
                     {kind.charAt(0).toUpperCase() + kind.slice(1)}
                     <small>
