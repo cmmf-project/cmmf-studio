@@ -38,3 +38,6 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Local-only demo video work (sources, capture tooling, footage and output)
+/demo-video/
