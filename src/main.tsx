@@ -19,7 +19,6 @@ import {
   Handle,
   Position,
   useReactFlow,
-  useNodesInitialized,
   useUpdateNodeInternals,
   applyNodeChanges,
   MarkerType,
@@ -789,14 +788,14 @@ function download(name: string, blob: Blob) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function Studio() {
-  const [board, setBoard] = useState<Board>(() => {
-    try {
-      const saved = localStorage.getItem("cmmf-studio");
-      return saved ? parseBoard(JSON.parse(saved)) : structuredClone(example);
-    } catch {
-      return structuredClone(example);
-    }
-  });
+  // Mount the full interface before reading or parsing the saved workspace.
+  const [board, setBoard] = useState<Board>(() => ({
+    version: 1,
+    name: "Opening workspace…",
+    models: [],
+    positions: {},
+  }));
+  const [workspaceReady, setWorkspaceReady] = useState(false);
   const boardRef = useRef(board);
   boardRef.current = board;
   const past = useRef<Board[]>([]),
@@ -822,8 +821,8 @@ function Studio() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(
     board.layout || "connections",
   );
-  const [loading, setLoading] = useState("");
-  const loadingLock = useRef(false);
+  const [loading, setLoading] = useState("Loading workspace…");
+  const loadingLock = useRef(true);
   const [layoutBusy, setLayoutBusy] = useState(false);
   const layoutLock = useRef(false);
   useEffect(() => {
@@ -861,14 +860,6 @@ function Studio() {
   }, [addMenu]);
   const fileRef = useRef<HTMLInputElement>(null);
   const flow = useReactFlow();
-  const nodesReady = useNodesInitialized();
-  const fitted = useRef(false);
-  useEffect(() => {
-    if (nodesReady && !fitted.current) {
-      fitted.current = true;
-      fitBoard(0);
-    }
-  }, [nodesReady]);
   const commit = useCallback((fn: (b: Board) => Board) => {
     const before = boardRef.current;
     const result = fn(before);
@@ -902,13 +893,15 @@ function Studio() {
     setHistoryTick((t) => t + 1);
   }
   useEffect(() => {
+    // Never replace the saved model with the empty startup canvas.
+    if (!workspaceReady) return;
     try {
       localStorage.setItem("cmmf-studio", JSON.stringify(board));
       setSaveError(false);
     } catch {
       setSaveError(true);
     }
-  }, [board]);
+  }, [board, workspaceReady]);
   useEffect(() => {
     if (notice) {
       const timer = setTimeout(() => setNotice(""), 5500);
@@ -1064,7 +1057,11 @@ function Studio() {
     if (!rect || !current.models.length) return;
     const points = current.models.flatMap((m) => {
       const p = current.positions[m.id] || { x: 0, y: 0 };
-      const size = modelSize(m, measurements);
+      const measured = flow.getNode(m.id)?.measured;
+      const size =
+        measured?.width && measured.height
+          ? { width: measured.width, height: measured.height }
+          : modelSize(m, measurements);
       return [p, { x: p.x + size.width, y: p.y + size.height }];
     });
     for (const route of Object.values(current.routes || {})) {
@@ -1093,6 +1090,56 @@ function Studio() {
     new Promise<void>((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
     );
+  async function settleCanvas(next: Board, cancelled = () => false) {
+    await paint();
+    // Wait for React Flow to mount and measure the replacement board.
+    while (!cancelled() && next.models.length) {
+      const rendered = flow.getNodes();
+      if (
+        rendered.length === next.models.length &&
+        next.models.every((model) =>
+          rendered.some(
+            (node) =>
+              node.id === model.id &&
+              node.measured?.width &&
+              node.measured?.height,
+          ),
+        )
+      )
+        break;
+      await paint();
+    }
+    if (cancelled()) return;
+    fitBoard(0);
+    await paint();
+  }
+  useEffect(() => {
+    let cancelled = false;
+    async function restoreWorkspace() {
+      // Let the sidebar, controls, empty canvas, and loading status paint first.
+      await paint();
+      if (cancelled) return;
+      let next: Board;
+      try {
+        const saved = localStorage.getItem("cmmf-studio");
+        next = saved ? parseBoard(JSON.parse(saved)) : structuredClone(example);
+      } catch {
+        next = structuredClone(example);
+      }
+      boardRef.current = next;
+      setBoard(next);
+      await settleCanvas(next, () => cancelled);
+      if (cancelled) return;
+      loadingLock.current = false;
+      setLoading("");
+      setWorkspaceReady(true);
+    }
+    void restoreWorkspace();
+    // Strict Mode replays mount effects; only the active restore may read/save.
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   async function loadBoard(
     label: string,
     prepare: () => Promise<Board> | Board,
@@ -1111,26 +1158,7 @@ function Studio() {
       setHovered(undefined);
       setHelp(false);
       setImportMenu(false);
-      await paint();
-      // Wait for React Flow to mount and measure the replacement board.
-      while (next.models.length) {
-        const rendered = flow.getNodes();
-        if (
-          rendered.length === next.models.length &&
-          next.models.every((model) =>
-            rendered.some(
-              (node) =>
-                node.id === model.id &&
-                node.measured?.width &&
-                node.measured?.height,
-            ),
-          )
-        )
-          break;
-        await paint();
-      }
-      fitBoard(0);
-      await paint();
+      await settleCanvas(next);
     } finally {
       loadingLock.current = false;
       setLoading("");
@@ -1456,9 +1484,11 @@ function Studio() {
               />
               <span className={`saved ${saveError ? "error" : ""}`}>
                 <span />{" "}
-                {saveError
-                  ? "Storage full · export a backup"
-                  : "Saved on this device"}
+                {!workspaceReady
+                  ? "Loading workspace…"
+                  : saveError
+                    ? "Storage full · export a backup"
+                    : "Saved on this device"}
               </span>
             </div>
             <div className="top-actions">
@@ -1901,14 +1931,17 @@ function Studio() {
                 className={`validation-badge ${errors.length ? "has-issues" : ""}`}
                 onClick={() => setShowIssues(!showIssues)}
               >
-                {errors.length ? (
-                  <span className="issue-dot" />
-                ) : (
-                  <Check size={14} />
-                )}{" "}
-                {errors.length
-                  ? `${errors.length} model issues`
-                  : "Model checks passed"}{" "}
+                {workspaceReady &&
+                  (errors.length ? (
+                    <span className="issue-dot" />
+                  ) : (
+                    <Check size={14} />
+                  ))}{" "}
+                {!workspaceReady
+                  ? "Loading model…"
+                  : errors.length
+                    ? `${errors.length} model issues`
+                    : "Model checks passed"}{" "}
                 <ChevronDown size={13} />
               </button>
               <div className="canvas-caption">

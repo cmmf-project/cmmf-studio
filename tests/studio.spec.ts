@@ -7,6 +7,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByLabel("Workspace name")).toHaveValue(
     "Customer stories",
   );
+  await expect(page.locator(".loading-overlay")).toHaveCount(0);
   await expect(async () => {
     const canvas = await page.locator(".canvas").boundingBox();
     const last = await page
@@ -662,6 +663,7 @@ test("import feedback supports themes and reduced motion, then recovers from inv
   }
   // A fresh page restores the native File API and confirms loading can be retried.
   await page.reload();
+  await expect(page.locator(".loading-overlay")).toHaveCount(0);
   await page.locator("input[type=file]").setInputFiles({
     name: "note.yaml",
     mimeType: "text/yaml",
