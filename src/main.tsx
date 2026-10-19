@@ -7,6 +7,7 @@ import React, {
   useContext,
 } from "react";
 import { createRoot } from "react-dom/client";
+import { createPortal } from "react-dom";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -829,6 +830,8 @@ function Studio() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(
     board.layout || "connections",
   );
+  const [loading, setLoading] = useState("");
+  const loadingLock = useRef(false);
   const [layoutBusy, setLayoutBusy] = useState(false);
   const layoutLock = useRef(false);
   useEffect(() => {
@@ -922,6 +925,10 @@ function Studio() {
   }, [notice]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
+      if (loadingLock.current) {
+        if ((e.metaKey || e.ctrlKey) && e.key === "z") e.preventDefault();
+        return;
+      }
       if (e.key === "Escape") {
         setPanels([]);
         setAddMenu(undefined);
@@ -1089,22 +1096,77 @@ function Studio() {
       { duration },
     );
   }
+  // Two frames let the browser paint the status before synchronous model work.
+  const paint = () =>
+    new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
+  async function loadBoard(
+    label: string,
+    prepare: () => Promise<Board> | Board,
+    resetPanels = true,
+  ) {
+    if (loadingLock.current) return;
+    loadingLock.current = true;
+    const focused = document.activeElement as HTMLElement | null;
+    setLoading(label);
+    try {
+      await paint();
+      const next = await prepare();
+      commit(() => next);
+      if (resetPanels) setPanels([]);
+      setSelected(undefined);
+      setHovered(undefined);
+      setHelp(false);
+      setImportMenu(false);
+      await paint();
+      // Wait for React Flow to mount and measure the replacement board.
+      while (next.models.length) {
+        const rendered = flow.getNodes();
+        if (
+          rendered.length === next.models.length &&
+          next.models.every((model) =>
+            rendered.some(
+              (node) =>
+                node.id === model.id &&
+                node.measured?.width &&
+                node.measured?.height,
+            ),
+          )
+        )
+          break;
+        await paint();
+      }
+      fitBoard(0);
+      await paint();
+    } finally {
+      loadingLock.current = false;
+      setLoading("");
+      // Restore keyboard focus after removing inert from the workspace.
+      requestAnimationFrame(() => {
+        if (focused?.isConnected) focused.focus();
+        else canvasRef.current?.focus({ preventScroll: true });
+      });
+    }
+  }
+  async function loadSample(sample: Board) {
+    try {
+      await loadBoard(`Loading ${sample.name}…`, () => structuredClone(sample));
+    } catch (e) {
+      setNotice(`Loading failed: ${(e as Error).message}`);
+    }
+  }
   async function arrange(mode: LayoutMode) {
-    if (layoutLock.current) return;
+    if (layoutLock.current || loadingLock.current) return;
     layoutLock.current = true;
     setLayoutBusy(true);
     setLayoutMode(mode);
-    const before = boardRef.current;
     try {
-      const next = await autoLayout(before, mode, measurements);
-      if (boardRef.current !== before) {
-        setNotice("The model changed while arranging. Run auto-layout again.");
-        return;
-      }
-      commit(() => next);
-      setHovered(undefined);
-      setSelected(undefined);
-      setTimeout(() => fitBoard(), 100);
+      await loadBoard(
+        "Arranging content types…",
+        () => autoLayout(boardRef.current, mode, measurements),
+        false,
+      );
     } catch (e) {
       setNotice(`Layout failed: ${(e as Error).message}`);
     } finally {
@@ -1333,29 +1395,27 @@ function Studio() {
   }
   async function importFile(file: File) {
     try {
-      const content = await file.text();
-      const input = file.name.endsWith(".json")
-        ? JSON.parse(content)
-        : YAML.parse(content);
-      let next = parseBoard(input);
-      const hasSavedPositions = next.models.every(
-        (m) =>
-          input.positions?.[m.id] &&
-          Number.isFinite(input.positions[m.id].x) &&
-          Number.isFinite(input.positions[m.id].y),
-      );
-      if (importMode !== "saved" || !hasSavedPositions) {
-        next = await autoLayout(
-          next,
-          importMode === "saved" ? layoutMode : importMode,
+      await loadBoard(`Importing ${file.name}…`, async () => {
+        const content = await file.text();
+        const input = file.name.endsWith(".json")
+          ? JSON.parse(content)
+          : YAML.parse(content);
+        let next = parseBoard(input);
+        const hasSavedPositions = next.models.every(
+          (m) =>
+            input.positions?.[m.id] &&
+            Number.isFinite(input.positions[m.id].x) &&
+            Number.isFinite(input.positions[m.id].y),
         );
-        setLayoutMode(next.layout!);
-      }
-      commit(() => next);
-      setPanels([]);
-      setSelected(undefined);
-      setHovered(undefined);
-      setTimeout(() => fitBoard(), 100);
+        if (importMode !== "saved" || !hasSavedPositions) {
+          next = await autoLayout(
+            next,
+            importMode === "saved" ? layoutMode : importMode,
+          );
+          setLayoutMode(next.layout!);
+        }
+        return next;
+      });
       setNotice("Workspace imported. Undo restores your previous board.");
     } catch (e) {
       setNotice(`Import failed: ${(e as Error).message}`);
@@ -1374,7 +1434,7 @@ function Studio() {
   return (
     <BoardContext.Provider value={board}>
       <Context.Provider value={actions}>
-        <div className="studio">
+        <div className="studio" inert={!!loading} aria-busy={!!loading}>
           <header className="topbar">
             <a className="brand" href="#" aria-label="CMMF Studio home">
               <picture>
@@ -1663,6 +1723,7 @@ function Studio() {
             </aside>
             <div
               className="canvas"
+              tabIndex={-1}
               ref={canvasRef}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -2002,27 +2063,13 @@ function Studio() {
               </p>
               <button
                 className="plain-button"
-                onClick={() => {
-                  commit(() => structuredClone(ecommerce));
-                  setSelected(undefined);
-                  setHovered(undefined);
-                  setPanels([]);
-                  setHelp(false);
-                  setTimeout(() => fitBoard(), 100);
-                }}
+                onClick={() => void loadSample(ecommerce)}
               >
                 Load large ecommerce model (can undo)
               </button>
               <button
                 className="plain-button"
-                onClick={() => {
-                  commit(() => structuredClone(example));
-                  setSelected(undefined);
-                  setHovered(undefined);
-                  setPanels([]);
-                  setHelp(false);
-                  setTimeout(() => fitBoard(), 100);
-                }}
+                onClick={() => void loadSample(example)}
               >
                 Load example board (can undo)
               </button>
@@ -2054,6 +2101,22 @@ function Studio() {
               </button>
             </div>
           )}
+          {loading &&
+            createPortal(
+              <div className="loading-overlay">
+                <div
+                  className="loading-card"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  <span className="loading-spinner" aria-hidden="true" />
+                  <strong>{loading}</strong>
+                  <span>Preparing your canvas</span>
+                </div>
+              </div>,
+              document.body,
+            )}
         </div>
       </Context.Provider>
     </BoardContext.Provider>

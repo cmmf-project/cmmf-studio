@@ -579,3 +579,94 @@ test("import offers automatic layouts and preserves saved positions when chosen"
     expect(saved.positions).toEqual(data.positions);
   }).toPass();
 });
+
+test("sample loading paints feedback before replacing the board and remains undoable", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const observer = new MutationObserver(() => {
+      if (!document.querySelector(".loading-overlay")) return;
+      observer.disconnect();
+      requestAnimationFrame(() => {
+        (window as any).loadingFrame = {
+          label: document.querySelector(".loading-card")?.textContent,
+          inert: document.querySelector(".studio")?.hasAttribute("inert"),
+          models: document.querySelectorAll(".react-flow__node").length,
+        };
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+  await page.getByRole("button", { name: "Canvas guide" }).click();
+  await page
+    .getByRole("button", { name: "Load large ecommerce model (can undo)" })
+    .click();
+  await expect(page.locator(".loading-overlay")).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).loadingFrame)).toMatchObject(
+    {
+      label: "Loading Large ecommerce store…Preparing your canvas",
+      inert: true,
+      models: 3,
+    },
+  );
+  await expect(page.locator(".react-flow__node")).toHaveCount(34);
+  await expect(page.locator(".studio")).not.toHaveAttribute("inert");
+  await expect(page.locator(".canvas")).toBeFocused();
+  await page.getByTitle("Undo (⌘Z)").click();
+  await expect(page.getByLabel("Workspace name")).toHaveValue(
+    "Customer stories",
+  );
+  await expect(page.locator(".react-flow__node")).toHaveCount(3);
+});
+
+test("import feedback supports themes and reduced motion, then recovers from invalid input", async ({
+  page,
+}) => {
+  await page.evaluate(() => {
+    const read = File.prototype.text;
+    File.prototype.text = async function () {
+      await new Promise<void>((resolve) => {
+        (window as any).releaseImport = resolve;
+      });
+      return read.call(this);
+    };
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const theme of ["light", "dark"]) {
+    if (theme === "dark")
+      await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    await page.locator("input[type=file]").setInputFiles({
+      name: "broken.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{invalid"),
+    });
+    const status = page
+      .getByRole("status")
+      .filter({ hasText: "Importing broken.json…" });
+    await expect(status).toBeVisible();
+    await expect(page.locator(".studio")).toHaveAttribute("inert", "");
+    await expect(page.locator(".loading-spinner")).toHaveCSS(
+      "animation-name",
+      "none",
+    );
+    await page.keyboard.press("Control+z");
+    await expect(page.getByLabel("Workspace name")).toHaveValue(
+      "Customer stories",
+    );
+    await page.screenshot({ path: `artifacts/studio-loading-${theme}.png` });
+    await page.evaluate(() => (window as any).releaseImport());
+    await expect(page.locator(".loading-overlay")).toHaveCount(0);
+    await expect(page.getByRole("status")).toContainText("Import failed:");
+    await expect(page.locator(".studio")).not.toHaveAttribute("inert");
+    await page.getByRole("button", { name: "Dismiss notification" }).click();
+  }
+  // A fresh page restores the native File API and confirms loading can be retried.
+  await page.reload();
+  await page.locator("input[type=file]").setInputFiles({
+    name: "note.yaml",
+    mimeType: "text/yaml",
+    buffer: Buffer.from("id: note\nname: Note\nkind: entry\nfields: []\n"),
+  });
+  await expect(page.getByLabel("Name of Note")).toBeVisible();
+  await expect(page.locator(".loading-overlay")).toHaveCount(0);
+});
