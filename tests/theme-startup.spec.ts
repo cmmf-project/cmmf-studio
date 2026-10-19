@@ -89,7 +89,7 @@ for (const scenario of scenarios) {
         "content",
         scenario.expected === "dark" ? "#192329" : "#F6F7F3",
       );
-      await expect(page.locator("#root")).toBeEmpty();
+      await expect(page.locator(".studio")).toHaveCount(0);
     } finally {
       releaseApp();
     }

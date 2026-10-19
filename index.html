@@ -32,6 +32,62 @@
         color-scheme: dark;
         background: #192329;
       }
+      /* Keep the startup brand aligned with the responsive Studio header. */
+      body {
+        margin: 0;
+      }
+      .startup-header {
+        box-sizing: border-box;
+        height: 76px;
+        display: flex;
+        align-items: center;
+        padding-left: 18px;
+        border-bottom: 1px solid #d9dfda;
+        background: #fff;
+      }
+      .startup-brand {
+        display: flex;
+        align-items: center;
+      }
+      .startup-header img {
+        display: block;
+        width: 208px;
+        height: auto;
+      }
+      .startup-logo-dark,
+      :root[data-theme="dark"] .startup-logo-light {
+        display: none;
+      }
+      :root[data-theme="dark"] .startup-logo-dark {
+        display: block;
+      }
+      :root[data-theme="dark"] .startup-header {
+        background: #222e34;
+        border-color: #425158;
+      }
+      @media (max-width: 1100px) {
+        .startup-header {
+          padding-left: 14px;
+        }
+      }
+      @media (max-width: 750px) {
+        .startup-header {
+          height: 65px;
+          padding-left: 10px;
+        }
+        .startup-header img {
+          width: 132px;
+        }
+      }
+      @media (max-width: 480px) {
+        .startup-header {
+          height: 104px;
+          align-items: flex-start;
+        }
+        .startup-brand {
+          height: 64px;
+        }
+      }
     </style>
     <link rel="icon" href="%BASE_URL%brand/favicon.svg" type="image/svg+xml" />
     <link
@@ -44,7 +100,46 @@
     <title>CMMF Studio</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- React replaces this header once the workspace is ready to render.
+           Use the same source assets so the interactive logo is already cached. -->
+      <header class="startup-header">
+        <div class="startup-brand">
+          <picture class="startup-logo-light">
+            <source
+              media="(max-width: 750px)"
+              width="501"
+              height="200"
+              srcset="
+                /src/assets/brand/studio-header-compact-gradient-light.svg
+              "
+            />
+            <img
+              src="/src/assets/brand/studio-header-horizontal-gradient-light.svg"
+              alt="CMMF Studio"
+              fetchpriority="high"
+              width="765"
+              height="256"
+            />
+          </picture>
+          <picture class="startup-logo-dark">
+            <source
+              media="(max-width: 750px)"
+              width="501"
+              height="200"
+              srcset="/src/assets/brand/studio-header-compact-gradient-dark.svg"
+            />
+            <img
+              src="/src/assets/brand/studio-header-horizontal-gradient-dark.svg"
+              alt="CMMF Studio"
+              fetchpriority="high"
+              width="765"
+              height="256"
+            />
+          </picture>
+        </div>
+      </header>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
