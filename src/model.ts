@@ -1,5 +1,13 @@
 import Ajv from "ajv";
-import schema from "./model.schema.json";
+import schema120 from "./model.schema.json";
+import { validateBetaModel } from "./beta-validation";
+import type { ValidationHint, DeclarationIssue } from "./validation-hints";
+import {
+  type CmmfVersion,
+  defaultCmmfVersion,
+  resolveCmmfVersion,
+  betaCmmfVersion,
+} from "./versions";
 export type FieldType =
   | "string"
   | "text"
@@ -14,9 +22,9 @@ export type FieldType =
   | "json"
   | "object"
   | "reference";
-export const fieldTypes = schema.definitions.field.properties.type
+export const fieldTypes = schema120.definitions.field.properties.type
   .enum as FieldType[];
-export const modelKinds = schema.properties.kind.enum as Model["kind"][];
+export const modelKinds = schema120.properties.kind.enum as Model["kind"][];
 export type Field = {
   id: string;
   name?: string;
@@ -52,6 +60,7 @@ export type Field = {
   [key: string]: unknown;
 };
 export type Model = {
+  validationHints?: ValidationHint[];
   id: string;
   name: string;
   kind: "entry" | "component" | "object" | "taxonomy" | "settings";
@@ -70,6 +79,8 @@ export type Model = {
   [key: string]: unknown;
 };
 export type Board = {
+  cmmfVersion?: CmmfVersion;
+  namespace?: string;
   layout?: "grid" | "connections";
   routes?: Record<
     string,
@@ -126,18 +137,36 @@ export function uniqueId(base: string, existing: string[]) {
   while (existing.includes(id)) id = `${slug(base)}-${i++}`;
   return id;
 }
-const validateModel = new Ajv({ allErrors: true, strict: false }).compile(
-  schema,
+const validateStable = new Ajv({ allErrors: true, strict: false }).compile(
+  schema120,
 );
-export function issues(models: Model[]): string[] {
+export function declarationIssues(
+  model: unknown,
+  version: CmmfVersion,
+): DeclarationIssue[] {
+  if (version === betaCmmfVersion) return validateBetaModel(model);
+  if (validateStable(model)) return [];
+  return (validateStable.errors || []).map((error) => ({
+    code: "schema",
+    path: error.instancePath || "/",
+    message: error.message || "Invalid declaration",
+  }));
+}
+export function issues(
+  models: Model[],
+  cmmfVersion: CmmfVersion = defaultCmmfVersion,
+): string[] {
   const out: string[] = [];
   const ids = models.map((m) => m.id);
   for (const m of models) {
-    if (!validateModel(m))
+    out.push(
+      ...declarationIssues(m, cmmfVersion).map(
+        (e) => `${m.name}: ${e.path} [${e.code}] ${e.message}`,
+      ),
+    );
+    if (cmmfVersion !== betaCmmfVersion && m.validationHints !== undefined)
       out.push(
-        ...(validateModel.errors || []).map(
-          (e) => `${m.name}: ${e.instancePath || "model"} ${e.message}`,
-        ),
+        `${m.name}: validationHints are preserved but require CMMF ${betaCmmfVersion}; stable 1.2.0 does not check or support them.`,
       );
     if (ids.filter((id) => id === m.id).length > 1)
       out.push(`${m.name}: duplicate model ID`);
@@ -194,16 +223,35 @@ export function issues(models: Model[]): string[] {
   }
   return [...new Set(out)];
 }
-export function parseBoard(input: unknown): Board {
+export function parseBoard(
+  input: unknown,
+  selectedVersion: CmmfVersion = defaultCmmfVersion,
+): Board {
   if (!input || typeof input !== "object")
     throw Error("Choose a CMMF model or a Studio workspace.");
   const obj = input as Record<string, unknown>;
   const models = (obj.models || (obj.fields ? [obj] : null)) as Model[];
   if (!Array.isArray(models) || (!models.length && obj.version !== 1))
     throw Error("No models found in this file.");
-  for (const m of models)
-    if (!validateModel(m))
-      throw Error(`Invalid CMMF model: ${validateModel.errors?.[0]?.message}`);
+  const declaredVersion =
+    obj.cmmfVersion !== undefined ? obj.cmmfVersion : obj.specVersion;
+  const cmmfVersion =
+    declaredVersion === undefined
+      ? selectedVersion
+      : resolveCmmfVersion(declaredVersion);
+  if (
+    obj.cmmfVersion !== undefined &&
+    obj.specVersion !== undefined &&
+    resolveCmmfVersion(obj.specVersion) !== cmmfVersion
+  )
+    throw Error("Conflicting CMMF version declarations.");
+  for (const m of models) {
+    const errors = declarationIssues(m, cmmfVersion);
+    if (errors.length)
+      throw Error(
+        `Invalid CMMF model ${m.id || ""}: ${errors[0].path} ${errors[0].message}`,
+      );
+  }
   if (new Set(models.map((m) => m.id)).size !== models.length)
     throw Error("Duplicate model IDs.");
   const positions: Board["positions"] = {};
@@ -236,7 +284,7 @@ export function parseBoard(input: unknown): Board {
               : undefined,
         };
     }
-  return {
+  const result: Board = {
     version: 1,
     name: typeof obj.name === "string" ? obj.name : "Imported model",
     models,
@@ -246,6 +294,10 @@ export function parseBoard(input: unknown): Board {
       : {}),
     ...(Object.keys(routes).length ? { routes } : {}),
   };
+  if (declaredVersion !== undefined || cmmfVersion !== defaultCmmfVersion)
+    result.cmmfVersion = cmmfVersion;
+  if (typeof obj.namespace === "string") result.namespace = obj.namespace;
+  return result;
 }
 export const example: Board = {
   version: 1,
