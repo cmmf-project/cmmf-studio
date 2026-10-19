@@ -555,8 +555,8 @@ export function FieldRules({
       ].includes(f.type) &&
         !isList(f) && (
           <p className="hint">
-            CMMF 1.2.0 defines no additional scalar validation controls for this
-            type. Requiredness, localisation and defaults still apply.
+            CMMF defines no additional scalar validation controls for this type.
+            Requiredness, localisation and defaults still apply.
           </p>
         )}
       {Object.keys(advanced).length > 0 && (

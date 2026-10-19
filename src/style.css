@@ -102,6 +102,32 @@ a {
   background: #8fa283;
   border-radius: 50%;
 }
+.sidebar-version-select {
+  display: block;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.sidebar-version-select span {
+  display: block;
+  margin-bottom: 6px;
+}
+.sidebar-version-select :is(select, input) {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 5px;
+  padding: 7px 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+.sidebar-version-select select {
+  cursor: pointer;
+}
+.sidebar-version-select :is(select, input):hover {
+  border-color: var(--accent);
+}
 .top-actions {
   display: flex;
   align-items: center;
@@ -1495,6 +1521,7 @@ legend {
 [data-theme="dark"] .search input {
   color: var(--text);
 }
+
 [data-theme="dark"] .panel-tabs button {
   color: var(--muted);
 }
@@ -1674,4 +1701,95 @@ legend {
   .loading-spinner {
     animation: none;
   }
+}
+
+/* Beta declaration authoring uses the same surface and contrast roles as Studio. */
+.panel-tabs {
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.panel-tabs button {
+  white-space: nowrap;
+}
+.validation-hint {
+  padding: 14px;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+.hint-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.hint-condition,
+.hint-actions {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.hint-condition .hint-condition {
+  margin-top: 10px;
+  border-left: 2px solid var(--accent);
+}
+.hint-field-choices {
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  margin-bottom: 12px;
+}
+.hint-field-choices small {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.hint-scalar {
+  min-width: 0;
+}
+.hint-action {
+  margin-bottom: 12px;
+}
+.hint-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hint-diagnostics {
+  color: var(--danger);
+  padding-left: 16px;
+  overflow-wrap: anywhere;
+}
+.hint-preserved {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.validation-hints .value-editor {
+  min-width: 0;
+}
+.validation-hints .hint {
+  overflow-wrap: anywhere;
+}
+.restore-warning {
+  position: absolute;
+  z-index: 25;
+  top: 48px;
+  right: 16px;
+  max-width: min(480px, calc(100% - 32px));
+  padding: 16px;
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 30px #0002;
+}
+.restore-warning p {
+  overflow-wrap: anywhere;
+}
+.restore-warning > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }

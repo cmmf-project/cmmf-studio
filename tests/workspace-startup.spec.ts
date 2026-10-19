@@ -148,7 +148,17 @@ for (const scenario of scenarios) {
       saved: scenario.saved,
     });
     expect(trace.reads[0].paintedFrames).toBeGreaterThan(0);
-    expect(trace.writes.length).toBeGreaterThan(0);
+    if (scenario.name === "corrupt saved data") {
+      expect(trace.writes).toEqual([]);
+      await expect(
+        page.getByRole("alert", {
+          name: "Saved workspace could not be opened",
+        }),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(() => localStorage.getItem("cmmf-studio")),
+      ).toBe(scenario.saved);
+    } else expect(trace.writes.length).toBeGreaterThan(0);
     for (const saved of trace.writes) {
       expect(saved.name).toBe(scenario.expectedName);
       expect(saved.models).toHaveLength(scenario.models);

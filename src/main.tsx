@@ -62,6 +62,7 @@ import {
   modelKinds,
   glyphs,
   uniqueId,
+  slug,
   example,
   issues,
   parseBoard,
@@ -72,6 +73,13 @@ import { FieldRules, ValueEditor, TokenInput } from "./config-controls";
 import { changeFieldType, updateReferenceConstraint } from "./field-config";
 import { ecommerce } from "./ecommerce";
 import {
+  CMMF_VERSIONS,
+  CMMF_VERSION_INFO,
+  defaultCmmfVersion,
+  betaCmmfVersion,
+  type CmmfVersion,
+} from "./versions";
+import {
   autoLayout,
   openPosition,
   modelSize,
@@ -81,6 +89,7 @@ import {
 } from "./layout";
 import { RoutedEdge } from "./routed-edge";
 import { KindIcon } from "./kind-icons";
+import { ValidationHints } from "./hint-controls";
 import studioLogoLight from "./assets/brand/studio-header-horizontal-gradient-light.svg";
 import studioLogoDark from "./assets/brand/studio-header-horizontal-gradient-dark.svg";
 import studioLogoCompactLight from "./assets/brand/studio-header-compact-gradient-light.svg";
@@ -337,6 +346,11 @@ function Details({
   const patch = (v: Partial<Field>) => f && a.patchField(m.id, f.id, v);
   const [tab, setTab] = useState("Intent");
   const board = useContext(BoardContext);
+  const hintsAvailable =
+    !f &&
+    (board.cmmfVersion === betaCmmfVersion || m.validationHints !== undefined);
+  const activeTab =
+    tab === "Validation hints" && !hintsAvailable ? "Intent" : tab;
   return (
     <>
       <div className="panel-eyebrow">
@@ -344,9 +358,15 @@ function Details({
       </div>
       <h2>{f?.name || m.name}</h2>
       <div className="panel-tabs">
-        {["Intent", "Rules", "Editorial", "Metadata"].map((t) => (
+        {[
+          "Intent",
+          "Rules",
+          "Editorial",
+          "Metadata",
+          ...(hintsAvailable ? ["Validation hints"] : []),
+        ].map((t) => (
           <button
-            className={tab === t ? "active" : ""}
+            className={activeTab === t ? "active" : ""}
             key={t}
             onClick={() => setTab(t)}
           >
@@ -354,7 +374,7 @@ function Details({
           </button>
         ))}
       </div>
-      {tab === "Intent" && (
+      {activeTab === "Intent" && (
         <>
           <label>
             Display name
@@ -424,7 +444,7 @@ function Details({
           </label>
         </>
       )}
-      {tab === "Rules" && (
+      {activeTab === "Rules" && (
         <>
           {f ? (
             <>
@@ -516,7 +536,7 @@ function Details({
           )}
         </>
       )}
-      {tab === "Editorial" && (
+      {activeTab === "Editorial" && (
         <>
           <label>
             Guidance for authors
@@ -600,7 +620,14 @@ function Details({
           </p>
         </>
       )}
-      {tab === "Metadata" && (
+      {activeTab === "Validation hints" && !f && (
+        <ValidationHints
+          model={m}
+          enabled={board.cmmfVersion === betaCmmfVersion}
+          change={(validationHints) => a.patchModel(m.id, { validationHints })}
+        />
+      )}
+      {activeTab === "Metadata" && (
         <>
           <p className="hint">
             Translation hints travel with CMMF without changing the core model.
@@ -796,6 +823,10 @@ function Studio() {
     positions: {},
   }));
   const [workspaceReady, setWorkspaceReady] = useState(false);
+  const [recovery, setRecovery] = useState<{
+    source: string;
+    message: string;
+  }>();
   const boardRef = useRef(board);
   boardRef.current = board;
   const past = useRef<Board[]>([]),
@@ -894,14 +925,14 @@ function Studio() {
   }
   useEffect(() => {
     // Never replace the saved model with the empty startup canvas.
-    if (!workspaceReady) return;
+    if (!workspaceReady || recovery) return;
     try {
       localStorage.setItem("cmmf-studio", JSON.stringify(board));
       setSaveError(false);
     } catch {
       setSaveError(true);
     }
-  }, [board, workspaceReady]);
+  }, [board, workspaceReady, recovery]);
   useEffect(() => {
     if (notice) {
       const timer = setTimeout(() => setNotice(""), 5500);
@@ -1120,10 +1151,15 @@ function Studio() {
       await paint();
       if (cancelled) return;
       let next: Board;
+      let saved: string | null = null;
       try {
-        const saved = localStorage.getItem("cmmf-studio");
+        saved = localStorage.getItem("cmmf-studio");
         next = saved ? parseBoard(JSON.parse(saved)) : structuredClone(example);
-      } catch {
+      } catch (error) {
+        // A newer/invalid declaration must not be silently replaced by a stable
+        // example on disk. Keep the original recoverable until an explicit reset.
+        if (saved)
+          setRecovery({ source: saved, message: (error as Error).message });
         next = structuredClone(example);
       }
       boardRef.current = next;
@@ -1153,7 +1189,10 @@ function Studio() {
       await paint();
       const next = await prepare();
       commit(() => next);
-      if (resetPanels) setPanels([]);
+      if (resetPanels) {
+        setPanels([]);
+        setRecovery(undefined);
+      }
       setSelected(undefined);
       setHovered(undefined);
       setHelp(false);
@@ -1171,7 +1210,11 @@ function Studio() {
   }
   async function loadSample(sample: Board) {
     try {
-      await loadBoard(`Loading ${sample.name}…`, () => structuredClone(sample));
+      await loadBoard(`Loading ${sample.name}…`, () => ({
+        ...structuredClone(sample),
+        cmmfVersion: boardRef.current.cmmfVersion,
+        namespace: boardRef.current.namespace,
+      }));
     } catch (e) {
       setNotice(`Loading failed: ${(e as Error).message}`);
     }
@@ -1271,7 +1314,7 @@ function Studio() {
       p.filter((w) => !(w.model === model && (!field || w.field === field))),
     );
   }
-  const errors = issues(board.models);
+  const errors = issues(board.models, board.cmmfVersion);
   const hoverSource = board.models.find((m) => m.id === hovered?.model);
   const hoverTargets = hoverSource?.fields.find((f) => f.id === hovered?.field);
   const hoverIds = new Set(
@@ -1406,8 +1449,17 @@ function Studio() {
       zip.file(`models/${m.id}.yaml`, YAML.stringify(m)),
     );
     zip.file(
+      "manifest.yaml",
+      YAML.stringify({
+        specVersion: board.cmmfVersion || defaultCmmfVersion,
+        namespace:
+          board.namespace || `studio.${slug(board.name) || "workspace"}`,
+        modelsPath: "./models",
+      }),
+    );
+    zip.file(
       "README.txt",
-      "CMMF 1.2.0 models exported from Model Studio. Each file is an individual model. Layout is saved separately using Save workspace.\n",
+      `CMMF ${board.cmmfVersion || defaultCmmfVersion} models exported from Model Studio. Models are in models/; manifest.yaml records the exact specification version. Validation hints describe intent; Studio does not evaluate content or expressions. Layout is saved separately using Save workspace.\n`,
     );
     download("cmmf-models.zip", await zip.generateAsync({ type: "blob" }));
     setMenu(false);
@@ -1420,7 +1472,10 @@ function Studio() {
         const input = file.name.endsWith(".json")
           ? JSON.parse(content)
           : YAML.parse(content);
-        let next = parseBoard(input);
+        let next = parseBoard(
+          input,
+          boardRef.current.cmmfVersion || defaultCmmfVersion,
+        );
         const hasSavedPositions = next.models.every(
           (m) =>
             input.positions?.[m.id] &&
@@ -1482,13 +1537,15 @@ function Studio() {
                   commit((b) => ({ ...b, name: e.target.value }))
                 }
               />
-              <span className={`saved ${saveError ? "error" : ""}`}>
+              <span className={`saved ${saveError || recovery ? "error" : ""}`}>
                 <span />{" "}
                 {!workspaceReady
                   ? "Loading workspace…"
-                  : saveError
-                    ? "Storage full · export a backup"
-                    : "Saved on this device"}
+                  : recovery
+                    ? "Original workspace kept · export changes"
+                    : saveError
+                      ? "Storage full · export a backup"
+                      : "Saved on this device"}
               </span>
             </div>
             <div className="top-actions">
@@ -1740,6 +1797,42 @@ function Studio() {
                   >
                     <HelpCircle size={16} /> Canvas guide <span>?</span>
                   </button>
+                  <label className="sidebar-version-select">
+                    <span>CMMF version</span>
+                    <select
+                      aria-label="CMMF version"
+                      value={board.cmmfVersion || defaultCmmfVersion}
+                      onChange={(e) =>
+                        commit((b) => ({
+                          ...b,
+                          cmmfVersion: e.target.value as CmmfVersion,
+                        }))
+                      }
+                    >
+                      {CMMF_VERSIONS.map((v) => (
+                        <option key={v} value={v}>
+                          {CMMF_VERSION_INFO[v].label}
+                          {CMMF_VERSION_INFO[v].status === "beta"
+                            ? " (beta)"
+                            : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="sidebar-version-select">
+                    <span>Export namespace</span>
+                    <input
+                      aria-label="Export namespace"
+                      value={board.namespace || ""}
+                      placeholder={`studio.${slug(board.name) || "workspace"}`}
+                      onChange={(e) =>
+                        commit((b) => ({
+                          ...b,
+                          namespace: e.target.value || undefined,
+                        }))
+                      }
+                    />
+                  </label>
                 </>
               )}
             </aside>
@@ -1762,6 +1855,41 @@ function Studio() {
                   setNotice("Drop fields inside a content type.");
               }}
             >
+              {recovery && (
+                <section
+                  className="restore-warning"
+                  role="alert"
+                  aria-label="Saved workspace could not be opened"
+                >
+                  <strong>Saved workspace could not be opened</strong>
+                  <p>{recovery.message}</p>
+                  <p>
+                    Showing the example. Your original saved data is unchanged;
+                    edits here are not autosaved until you choose to replace it.
+                  </p>
+                  <div>
+                    <button
+                      className="plain-button"
+                      onClick={() =>
+                        download(
+                          "unopened-workspace.cmmf.json",
+                          new Blob([recovery.source], {
+                            type: "application/json",
+                          }),
+                        )
+                      }
+                    >
+                      Download original workspace
+                    </button>
+                    <button
+                      className="plain-button"
+                      onClick={() => setRecovery(undefined)}
+                    >
+                      Save current workspace instead
+                    </button>
+                  </div>
+                </section>
+              )}
               <div className="canvas-heading">
                 <span className="board-count">
                   {board.models.length} content types <span>·</span>{" "}
@@ -2051,8 +2179,15 @@ function Studio() {
                 </ul>
               ) : (
                 <p>
-                  All models pass the CMMF 1.2.0 schema and target checks. Ready
-                  to export.
+                  All models pass the{" "}
+                  {
+                    CMMF_VERSION_INFO[board.cmmfVersion || defaultCmmfVersion]
+                      .label
+                  }{" "}
+                  schema and target checks.{" "}
+                  {board.cmmfVersion === betaCmmfVersion
+                    ? "Hint declarations are checked; content and expressions are not evaluated."
+                    : "Ready to export."}
                 </p>
               )}
             </section>
@@ -2101,14 +2236,17 @@ function Studio() {
               <button
                 className="plain-button"
                 onClick={() => {
-                  commit(() => ({
+                  commit((b) => ({
                     version: 1,
+                    cmmfVersion: b.cmmfVersion,
+                    namespace: b.namespace,
                     name: "Untitled model",
                     models: [],
                     positions: {},
                   }));
                   setPanels([]);
                   setHelp(false);
+                  setRecovery(undefined);
                 }}
               >
                 Start an empty board (can undo)

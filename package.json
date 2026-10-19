@@ -9,7 +9,8 @@
     "test": "vitest run src",
     "preview": "vite preview --host 0.0.0.0",
     "test:browser": "playwright test",
-    "format": "prettier --write src tests *.ts *.json *.md index.html"
+    "format": "prettier --write src tests *.ts *.json *.md index.html",
+    "check:cmmf": "node scripts/check-cmmf-source.mjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.12.0",
