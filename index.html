@@ -3,7 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#192329" />
+    <meta name="theme-color" content="#F6F7F3" />
+    <script>
+      // Apply the theme before app modules, styles, or saved models load.
+      (() => {
+        let saved;
+        try {
+          saved = localStorage.getItem("cmmf-theme");
+        } catch {}
+        const theme =
+          saved === "dark" || saved === "light"
+            ? saved
+            : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.dataset.theme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", theme === "dark" ? "#192329" : "#F6F7F3");
+      })();
+    </script>
+    <style>
+      :root[data-theme="light"] {
+        color-scheme: light;
+        background: #f6f7f3;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        background: #192329;
+      }
+    </style>
     <link rel="icon" href="%BASE_URL%brand/favicon.svg" type="image/svg+xml" />
     <link
       rel="icon"

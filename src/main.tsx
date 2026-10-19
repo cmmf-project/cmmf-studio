@@ -815,18 +815,9 @@ function Studio() {
   const [pan, setPan] = useState(false);
   const [library, setLibrary] = useState(true);
   const [hovered, setHovered] = useState<{ model: string; field: string }>();
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    try {
-      const saved = localStorage.getItem("cmmf-theme");
-      return saved === "dark" || saved === "light"
-        ? saved
-        : window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
-    } catch {
-      return "light";
-    }
-  });
+  const [theme, setTheme] = useState<"light" | "dark">(() =>
+    document.documentElement.dataset.theme === "dark" ? "dark" : "light",
+  );
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(
     board.layout || "connections",
   );
