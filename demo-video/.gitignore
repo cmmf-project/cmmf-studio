@@ -1,0 +1,10 @@
+node_modules/
+out/
+public/recordings/
+public/stills/
+public/fonts/
+public/*.json
+public/*.yaml
+public/*.zip
+.remotion/
+*.log

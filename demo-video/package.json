@@ -1,0 +1,29 @@
+{
+  "name": "cmmf-studio-demo-video",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts --port 3001",
+    "capture": "node scripts/capture.mjs",
+    "capture:estate": "node scripts/capture-estate.mjs",
+    "prepare": "node scripts/prepare.mjs",
+    "footage": "node scripts/process-footage.mjs",
+    "check": "tsc",
+    "qa": "node scripts/qa.mjs",
+    "render": "remotion render src/index.ts StudioDemo out/studio-demo.mp4 --codec h264 --concurrency 4",
+    "sample": "remotion render src/index.ts EstateSample out/estate-sample.mp4 --codec h264 --concurrency 4"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.535",
+    "@remotion/media": "4.0.535",
+    "@remotion/fonts": "4.0.535",
+    "remotion": "4.0.535",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "typescript": "~5.9.3"
+  }
+}

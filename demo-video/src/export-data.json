@@ -1,0 +1,5 @@
+{
+  "excerpt": "id: product\nname: Product\nkind: entry\nfields:\n  - id: variants\n    name: Variants\n    type: reference\n    targets:\n      - product-variant\n    list: true\n    required: true\n    relation:\n      ownership: contained\n      ordered: true\n      minItems: 1\n",
+  "models": 34,
+  "fields": 201
+}
