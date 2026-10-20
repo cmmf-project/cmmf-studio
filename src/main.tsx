@@ -50,6 +50,7 @@ import {
   Sun,
   LayoutGrid,
   GitBranch,
+  FilePlus2,
 } from "lucide-react";
 import YAML from "yaml";
 import {
@@ -1219,6 +1220,28 @@ function Studio() {
       setNotice(`Loading failed: ${(e as Error).message}`);
     }
   }
+  async function newCanvas() {
+    if (loadingLock.current) return;
+    try {
+      await loadBoard("Creating a new canvas…", () => ({
+        version: 1,
+        cmmfVersion: boardRef.current.cmmfVersion,
+        namespace: boardRef.current.namespace,
+        name: "Untitled model",
+        models: [],
+        positions: {},
+      }));
+      setSearch("");
+      setMenu(false);
+      setAddMenu(undefined);
+      setShowIssues(false);
+      setMeasurements({});
+      setNotice("New canvas ready. Undo to restore your previous workspace.");
+      await flow.setViewport({ x: 0, y: 0, zoom: 1 });
+    } catch (e) {
+      setNotice(`Creating a new canvas failed: ${(e as Error).message}`);
+    }
+  }
   async function arrange(mode: LayoutMode) {
     if (layoutLock.current || loadingLock.current) return;
     layoutLock.current = true;
@@ -1584,6 +1607,16 @@ function Studio() {
                 <Redo2 size={18} />
               </button>
               <span className="divider" />
+              <div className="new-canvas">
+                <button
+                  className="plain-button"
+                  aria-label="New canvas"
+                  title="New canvas (can undo)"
+                  onClick={() => void newCanvas()}
+                >
+                  <FilePlus2 size={15} /> <span>New canvas</span>
+                </button>
+              </div>
               <div className="export-wrap import-wrap">
                 <button
                   className="plain-button"
@@ -2233,22 +2266,7 @@ function Studio() {
               >
                 Load example board (can undo)
               </button>
-              <button
-                className="plain-button"
-                onClick={() => {
-                  commit((b) => ({
-                    version: 1,
-                    cmmfVersion: b.cmmfVersion,
-                    namespace: b.namespace,
-                    name: "Untitled model",
-                    models: [],
-                    positions: {},
-                  }));
-                  setPanels([]);
-                  setHelp(false);
-                  setRecovery(undefined);
-                }}
-              >
+              <button className="plain-button" onClick={() => void newCanvas()}>
                 Start an empty board (can undo)
               </button>
             </section>

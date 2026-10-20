@@ -998,7 +998,22 @@ main {
     left: 240px;
   }
 }
+@media (max-width: 480px) {
+  .topbar .top-actions {
+    gap: 2px;
+  }
+  .topbar .top-actions :is(.plain-button, .dark-button) {
+    padding: 7px 5px;
+    gap: 4px;
+  }
+}
 @media (max-width: 750px) {
+  .new-canvas .plain-button {
+    padding: 7px;
+  }
+  .new-canvas .plain-button > span {
+    display: none;
+  }
   .topbar {
     height: 65px;
     padding: 0 12px;
