@@ -35,4 +35,4 @@ On 11 November 2026, the local production build, 145 unit tests and 41 browser t
 
 Live verification: `https://studio.cmmf.dev` returned HTTP 200 with certificate verification enabled; HTTP redirected to HTTPS with 301. Linked scripts, styles, logos and icons returned 200 with appropriate content types. All 41 browser tests passed against the custom domain, including import/export, persistence and layouts; the rendered canvas was visually inspected. Public DNS returned Cloudflare addresses, while the local resolver retained a stale negative result. Verification used the public DNS address with curl `--resolve` and Chromium host resolver mapping; neither system DNS nor certificate verification was changed.
 
-At the final launch checks, Cloudflare's domain API still reported `pending` (verification active, validation pending), although HTTPS and the live browser suite worked. This status can lag DNS setup; recheck it in Pages Custom domains.
+Cloudflare's final domain check reported domain, verification and validation all `active`.
