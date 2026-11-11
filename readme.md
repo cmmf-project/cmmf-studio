@@ -10,6 +10,10 @@ A browser-based visual editor for CMMF content models. Built with React, TypeScr
 
 Studio uses the CMMF identity, with Source Sans 3 for interface text and Quattrocento for dedicated reading content. See [branding integration](docs/branding.md) for the font roles and asset locations. The full brand workspace is maintained separately from this application.
 
+## Hosting
+
+Studio is configured for Cloudflare Pages at `studio.cmmf.dev`. See the [deployment runbook](docs/deployment.md) for build settings, DNS, rollback and moving browser workspaces.
+
 ## Run locally
 
 ```sh

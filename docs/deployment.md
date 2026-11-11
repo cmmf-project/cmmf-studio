@@ -1,0 +1,34 @@
+# Studio hosting
+
+CMMF Studio is a static Cloudflare Pages application, separate from the docs site.
+
+| Setting | Value |
+| --- | --- |
+| Pages project | `cmmf-studio` |
+| Repository | `headless-company/cmmf-visual-editor` |
+| Production branch | `main` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Root directory | Repository root |
+| Production domain | `studio.cmmf.dev` |
+| Provider domain | `cmmf-studio.pages.dev` |
+
+Cloudflare's Git integration builds production when `main` changes and preview deployments for other branches. No runtime secrets, server, database or paid bindings are required. Dependencies install from `package-lock.json` during the build. Local checks are `npm ci`, `npm run build`, `npm test`, and `npm run test:browser` against a running local preview.
+
+## Domain setup
+
+Register `studio.cmmf.dev` under the project's **Custom domains** before adding its DNS record. In the `cmmf.dev` Cloudflare DNS zone, use a proxied CNAME named `studio` targeting `cmmf-studio.pages.dev`, with automatic TTL. Preserve the docs apex, `www`, mail and other unrelated records.
+
+Cloudflare must report the domain active and issue its HTTPS certificate before launch is complete. Verify the real custom domain, its assets and an import/export round trip; a successful Pages build alone does not establish this.
+
+See [Cloudflare custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/).
+
+## Storage and recovery
+
+Workspaces remain in each visitor's browser storage. Localhost, preview URLs, `pages.dev` and `studio.cmmf.dev` have separate storage. Before moving between them, use **Export → Save workspace**, then import the downloaded file at the new address with **Keep saved positions**. Hosting does not add cloud saves or accounts.
+
+For a failed release, use the Pages deployment history to roll back to the previous successful production deployment. Then correct the source on a branch, verify it and merge the fix. Avoid deleting/recreating the project or changing DNS to roll back app code.
+
+## Initial publication evidence
+
+On 11 November 2026, the local production build, 145 unit tests and 41 browser tests passed. The first hosted build was requested from `b967729ef94ed40d3855ea4eb475af6319213437`. The project is Git-connected; its custom domain was registered. Live build and domain status must be checked separately before claiming launch completion.
