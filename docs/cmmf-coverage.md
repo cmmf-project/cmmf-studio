@@ -1,6 +1,6 @@
 # CMMF editor coverage
 
-Checked against the CMMF 1.2.0 specification, canonical-type guide, validation guide and `schemas/model.schema.json` in the neighbouring `headless-company/content-model-master-format` checkout. The vendored schema matches that source. [Upstream repository](https://github.com/headless-company/content-model-master-format).
+Checked against the CMMF 1.2.0 specification, canonical-type guide, validation guide and `schemas/model.schema.json` in the neighbouring `cmmf-project/content-model-master-format` checkout. The vendored schema matches that source. [Upstream repository](https://github.com/cmmf-project/content-model-master-format).
 
 The palette derives its type list from that schema, and the kind selectors derive their options from the schema's model-kind enum.
 
