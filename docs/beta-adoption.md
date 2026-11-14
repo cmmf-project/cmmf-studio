@@ -24,7 +24,7 @@ The export ZIP contains `manifest.yaml` and `models/*.yaml`. The manifest uses t
 
 ## Pinned source and verification
 
-Source: [v1.3.0-beta.1 adoption guide](https://github.com/headless-company/content-model-master-format/blob/v1.3.0-beta.1/docs/beta-testing.md), commit `a0c7a3d87fe46d74b5e78ac851e8b156201376a4`.
+Source: [v1.3.0-beta.1 adoption guide](https://github.com/cmmf-project/content-model-master-format/blob/v1.3.0-beta.1/docs/beta-testing.md), commit `a0c7a3d87fe46d74b5e78ac851e8b156201376a4`.
 
 `vendor/cmmf/1.3.0-beta.1/` holds the unmodified tagged schema, normative spec, translation contract, guide, declaration checker, examples, tests, and Apache-2.0 licence. `source.json` records SHA-256 checksums and provenance. Builds use these local files and never fetch a moving branch. `src/beta-validation.ts` is a browser adaptation of the pinned checker's declaration semantics; `src/beta-validation.test.js` ports its declaration fixtures. The original upstream CLI suite is retained unchanged in the vendor directory.
 
