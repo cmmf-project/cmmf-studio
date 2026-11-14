@@ -4,20 +4,20 @@ CMMF Studio is a static Cloudflare Pages application, separate from the docs sit
 
 | Setting | Value |
 | --- | --- |
-| Pages project | `cmmf-studio` |
-| Repository | `headless-company/cmmf-visual-editor` |
+| Pages project | `cmmf-studio-project` |
+| Repository | `cmmf-project/cmmf-studio` |
 | Production branch | `main` |
 | Build command | `npm run build` |
 | Output directory | `dist` |
 | Root directory | Repository root |
 | Production domain | `studio.cmmf.dev` |
-| Provider domain | `cmmf-studio.pages.dev` |
+| Provider domain | `cmmf-studio-project.pages.dev` |
 
 Cloudflare's Git integration builds production when `main` changes and preview deployments for other branches. No runtime secrets, server, database or paid bindings are required. Dependencies install from `package-lock.json` during the build. Local checks are `npm ci`, `npm run build`, `npm test`, and `npm run test:browser` against a running local preview.
 
 ## Domain setup
 
-Register `studio.cmmf.dev` under the project's **Custom domains** before adding its DNS record. In the `cmmf.dev` Cloudflare DNS zone, use a proxied CNAME named `studio` targeting `cmmf-studio.pages.dev`, with automatic TTL. Preserve the docs apex, `www`, mail and other unrelated records.
+Register `studio.cmmf.dev` under the project's **Custom domains** before adding its DNS record. In the `cmmf.dev` Cloudflare DNS zone, use a proxied CNAME named `studio` targeting `cmmf-studio-project.pages.dev`, with automatic TTL. Preserve the docs apex, `www`, mail and other unrelated records.
 
 Cloudflare must report the domain active and issue its HTTPS certificate before launch is complete. Verify the real custom domain, its assets and an import/export round trip; a successful Pages build alone does not establish this.
 
@@ -36,3 +36,5 @@ On 11 November 2026, the local production build, 145 unit tests and 41 browser t
 Live verification: `https://studio.cmmf.dev` returned HTTP 200 with certificate verification enabled; HTTP redirected to HTTPS with 301. Linked scripts, styles, logos and icons returned 200 with appropriate content types. All 41 browser tests passed against the custom domain, including import/export, persistence and layouts; the rendered canvas was visually inspected. Public DNS returned Cloudflare addresses, while the local resolver retained a stale negative result. Verification used the public DNS address with curl `--resolve` and Chromium host resolver mapping; neither system DNS nor certificate verification was changed.
 
 Cloudflare's final domain check reported domain, verification and validation all `active`.
+
+The organisation cutover is recorded in [the current hosting record](https://github.com/cmmf-project/cmmf-studio/blob/main/docs/org-migration.md). The former Pages project is retained for recovery with automatic builds disabled.
