@@ -4,20 +4,21 @@ CMMF Studio is a static Cloudflare Pages application, separate from the docs sit
 
 | Setting | Value |
 | --- | --- |
-| Pages project | `cmmf-studio-project` |
+| Cloudflare account | CMMF Project |
+| Pages project | `cmmf-project-studio` |
 | Repository | `cmmf-project/cmmf-studio` |
 | Production branch | `main` |
 | Build command | `npm run build` |
 | Output directory | `dist` |
 | Root directory | Repository root |
 | Production domain | `studio.cmmf.dev` |
-| Provider domain | `cmmf-studio-project.pages.dev` |
+| Provider domain | `cmmf-project-studio.pages.dev` |
 
 Cloudflare's Git integration builds production when `main` changes and preview deployments for other branches. No runtime secrets, server, database or paid bindings are required. Dependencies install from `package-lock.json` during the build. Local checks are `npm ci`, `npm run build`, `npm test`, and `npm run test:browser` against a running local preview.
 
 ## Domain setup
 
-Register `studio.cmmf.dev` under the project's **Custom domains** before adding its DNS record. In the `cmmf.dev` Cloudflare DNS zone, use a proxied CNAME named `studio` targeting `cmmf-studio-project.pages.dev`, with automatic TTL. Preserve the docs apex, `www`, mail and other unrelated records.
+Register `studio.cmmf.dev` under the project's **Custom domains** before adding its DNS record. In the `cmmf.dev` Cloudflare DNS zone, use a proxied CNAME named `studio` targeting `cmmf-project-studio.pages.dev`, with automatic TTL. Preserve the docs apex, `www`, mail and other unrelated records.
 
 Cloudflare must report the domain active and issue its HTTPS certificate before launch is complete. Verify the real custom domain, its assets and an import/export round trip; a successful Pages build alone does not establish this.
 
@@ -37,4 +38,4 @@ Live verification: `https://studio.cmmf.dev` returned HTTP 200 with certificate 
 
 Cloudflare's final domain check reported domain, verification and validation all `active`.
 
-The organisation cutover is recorded in [the current hosting record](https://github.com/cmmf-project/cmmf-studio/blob/main/docs/org-migration.md). The former Pages project is retained for recovery with automatic builds disabled.
+The organisation cutover is recorded in [the current hosting record](https://github.com/cmmf-project/cmmf-studio/blob/main/docs/org-migration.md). The original account retains the independent Direct Upload project `cmmf-studio-recovery`; the superseded Git-linked projects were deleted after recovery verification. Their historical deployment URLs are no longer available. The current hosting record also documents the dedicated-account cutover.
